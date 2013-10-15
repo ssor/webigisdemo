@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en" style="height:100%;">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png"> -->
+
+    <title>综合实验</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">    
+    <!-- Bootstrap theme -->
+    <link rel='stylesheet' href='/bootstrap/css/bootstrap-theme.css' />
+
+    <!-- Custom styles for this template -->
+    <link href="/stylesheets/theme-webgis.css" rel="stylesheet">
+    <script type="text/javascript" src="http://api.go2map.com/maps/js/api_v2.5.1.js"></script>
+    <script type="text/javascript">
+      var map;
+      function initialize() {
+        var myLatlng = new sogou.maps.Point(12983703.125, 4827636.71875);
+        var myOptions = {
+          zoom: 12,
+          center: myLatlng,
+          mapTypeId: sogou.maps.MapTypeId.ROADMAP
+        }
+        map = new sogou.maps.Map(document.getElementById("map_canvas"), myOptions);
+        // setTimeout(getGpsData, 3000);
+        setInterval(getGpsData, 3000); 
+      }    
+    function getGpsData()
+    {
+        $.get("/getgps", function (data) {
+          // alert(data);
+          if(data.status == "failed"){
+
+          }else {
+            var myPoint = new sogou.maps.Point(data.x,data.y);
+
+            if(data.type != 'sogou'){
+              var convertor = getInstance(sogou.maps.Convertor);
+              myPoint = convertor.toSogou(new sogou.maps.LatLng(data.y, data.x));
+            }
+            placeMarker(myPoint);
+          }
+        });
+    }
+    function placeMarker(location) {
+        var clickedLocation = location;
+        var marker = new sogou.maps.Marker({
+            position: location,
+            map: map
+        });
+       
+        map.setCenter(location);
+      }
+    </script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../docs-assets/js/html5shiv.js"></script>
+      <script src="../../docs-assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body onload="initialize()">
+
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">GPS运输监控综合实验</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li></li>
+            <li class="active"><a style="font-size:22px;" href="#">京A-12345</a></li>
+            <!-- <li><a href="#about">About</a></li> -->
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">经度:116.924</a></li>
+            <li><a href="#">纬度:39.427</a></li>
+          </ul>
+
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container theme-showcase" style="height:100%;">
+<!--       <div style="background-color: gainsboro;
+height: 35px;
+line-height: 35px;
+text-align: center;
+font-size: 22px;
+margin-bottom: 1px;">
+        <p>京A-12345</p>
+      </div> -->
+      <div id="map_canvas" class='span12' style="height:98%;"></div>
+    </div> <!-- /container -->
+
+    <footer class="container" role="contentinfo">
+    <div style = "text-align: center;">北京ABC智能物联网有限公司</div>
+    </footer>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src = "/javascripts/jquery.js"></script>
+    <script src="/bootstrap/js/bootstrap.js"></script>                         
+    <script type="text/javascript" src = "/javascripts/holder.js"></script>
+
+    <!-- // <script src="../../docs-assets/js/jquery.js"></script> -->
+    <!-- // <script src="../../dist/js/bootstrap.min.js"></script> -->
+    <!-- // <script src="../../docs-assets/js/holder.js"></script> -->
+  </body>
+</html>

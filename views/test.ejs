@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">    
+    <link rel='stylesheet' href='/stylesheets/signin.css' />
+    <script type="text/javascript">
+    	function postjson(){
+    		$.post("/postgps", { carID: "A123456", lat: "39.4", lng: "116.39" }, function (data) {
+    			alert(data.status);
+    		});
+    	}
+    </script>
+  </head>
+  <body>
+	 <div class="container">
+
+	      <form class="form-signin">
+	        <h2 class="form-signin-heading">Please sign in</h2>
+	        <input type="text" class="form-control" placeholder="Email address" autofocus>
+	        <input type="password" class="form-control" placeholder="Password">
+	        <label class="checkbox">
+	          <input type="checkbox" value="remember-me"> Remember me
+	        </label>
+	        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+	      </form>
+	        <button class="btn btn-lg btn-primary btn-block" onclick="postjson()">提交数据</button>
+
+	    </div> <!-- /container -->    
+    <script type="text/javascript" src = "/javascripts/jquery.js"></script>
+	<script src="/bootstrap/js/bootstrap.js"></script>                         
+
+  </body>
+</html>

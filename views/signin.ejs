@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">    
+    <link rel='stylesheet' href='/stylesheets/signin.css' />
+    <link rel='stylesheet' href='/bootstrap/css/bootstrap-theme.css' />
+  </head>
+  <body>
+    <!-- <h1><%= title %></h1> -->
+	 <div class="container">
+
+	      <form class="form-signin" action="/webgis">
+	        <h2 class="form-signin-heading" style="font-size:22px;text-align:center;margin-bottom:30px;">登录GPS车辆监控系统</h2>
+	        <input type="text" class="form-control" placeholder="请输入车辆识别码" autofocus>
+	        <input type="password" class="form-control" placeholder="密码">
+<!-- 	        <label class="checkbox">
+	          <input type="checkbox" value="remember-me"> Remember me
+	        </label> -->
+	        <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top: 50px;">登录</button>
+	      </form>
+
+	    </div> <!-- /container -->    
+    <!-- <p>Welcome to <%= title %></p> -->
+    <script type="text/javascript" src = "/javascripts/jquery.js"></script>
+	<script src="/bootstrap/js/bootstrap.js"></script>                         
+
+  </body>
+</html>
