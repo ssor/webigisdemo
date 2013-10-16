@@ -18,74 +18,193 @@
 
     <!-- Custom styles for this template -->
     <link href="/stylesheets/theme-webgis.css" rel="stylesheet">
+
     <script type="text/javascript" src="http://api.go2map.com/maps/js/api_v2.5.1.js"></script>
     <script type="text/javascript">
+      var areamap = {};
+      areamap['wudaokou'] = {
+        center: new sogou.maps.LatLng(39.992792,116.326142),
+        population: 2842518
+      };
+      areamap['baofusi'] = {
+        center: new sogou.maps.Point(12949589,4835996),
+        population: 8143197
+      };
+      areamap['zhongguancun'] = {
+        center: new sogou.maps.LatLng(39.986017,116.31049),
+        population: 3844829
+      }
+
+
       var map;
       var points = new Array();
+      var cityCircle;
+      //创建3个地区范围的圆圈，半径为人口数量示意
+      //圆心的坐标，可以是经纬度坐标，也可以是搜狗坐标
+      var area = {
+        center: new sogou.maps.Point(12949589,4835996),
+        population: 8143197
+      };
+
       function initialize() {
-        //bwu 12983703.125  4827636.71875
-        // var myLatlng = new sogou.maps.LatLng(39.992792,116.326142);
-        var myLatlng = new sogou.maps.Point(12983703.125, 4827636.71875);
-        var myOptions = {
-          zoom: 12,
-          center: myLatlng,
-          mapTypeId: sogou.maps.MapTypeId.ROADMAP
-        }
-        map = new sogou.maps.Map(document.getElementById("map_canvas"), myOptions);
-         
-        sogou.maps.event.addListener(map, 'click', function(event) {
-          //获取点击位置的坐标
-          // alert(event.point)
-          // postjson(event.point.y, event.point.x);
-          placeMarker(event.point);
-          points.push(event.point);
-        });
+            var myPoint = new sogou.maps.LatLng(39.988176,116.319404);
+            // var myPoint = new sogou.maps.Point(12959000,4822625);
+            //定义标记样式
+            var markerStyle=new sogou.maps.MarkerImage('http://api.go2map.com/maps/images/v2.0/c31.png',
+                  // 蓝点图标宽16像素，高14像素
+                  new sogou.maps.Size(16, 14),
+                  // 原点在图片的(34,88)
+                  new sogou.maps.Point(34,88),
+                  // 锚点在图标中心
+                  new sogou.maps.Point(8,7),
+                  // 合并图片的大小
+                  new sogou.maps.Size(51, 156));
+            //定义带箭头的样式
+            var myOptions = {
+              zoom: 15,
+              center: myPoint,
+              mapTypeId: sogou.maps.MapTypeId.TERRAIN
+            };
+     
+            map = new sogou.maps.Map(document.getElementById("map_canvas"), myOptions);
+     
+
+            var lineStyle={id:"L02","v:stroke":{color:"#0cf",weight:"5",endcap:"Round",opacity:"75%",endArrow:"Classic",endarrowlength:"long",endarrowwidth:"wide"}};
+     
+            var line = new sogou.maps.Polyline({
+                map:map,
+                style:lineStyle,
+                zIndex:2
+            });
+            var path=[],marker;
+            sogou.maps.event.addListener(map,"click",function(evt)
+            {
+                writeoutLocation(evt.point);
+                //evt.point 搜狗地图坐标
+                path.push(evt.point);
+                //添加节点蓝点，计算路径距离
+                var distance = calcDistance(path);
+                if(path.length <= 1){
+                  marker=new sogou.maps.Marker(
+                    { map:map,
+                      position:evt.point,
+                      icon:markerStyle,
+                      label:{visible:true}});                  
+                }else{
+                  marker=new sogou.maps.Marker(
+                    { map:map,
+                      position:evt.point,
+                      icon:markerStyle,
+                      title:distance+"米",
+                      label:{visible:true}});
+                }
+
+                if(path.length>1)
+                {
+                    line = new sogou.maps.Polyline({
+                        map:map,
+                        styles:[lineStyle],
+                        zIndex:2
+                    });
+                    drawCircle(path[0], distance);
+                    path=[];
+                    // path.push(evt.point);
+                }
+             
+            });
+            sogou.maps.event.addListener(map,"mousemove",function(evt)
+            {
+                //evt.point 搜狗地图坐标
+                path.length>0&&line.setPath(path.concat([evt.point]));
+             
+            });
+            //点击右键结束
+            sogou.maps.event.addListener(map,"rightclick",function(evt)
+            {
+                //evt.point 搜狗地图坐标
+                line.remove();
+                path=[];
+            });
+            //计算距离
+            var convertor=new sogou.maps.Convertor();
+            function calcDistance(a)
+            {
+                var b=0,i;
+                for(i=0;i<a.length;i++)
+                {
+                    if(a[i+1]) b+=convertor.distance(a[i],a[i+1]);
+                }
+                return parseInt(b)
+            }
+            // sogou.maps.event.addListener(map, 'click', function(event) {
+            //   //获取点击位置的坐标
+            //   placeMarker(event.point);
+            //   points.push(event.point);
+            // });
+
       }
-       
-      function placeMarker(location) {
-        var clickedLocation = location;
-        var marker = new sogou.maps.Marker({
-            position: location,
-            map: map
-        });
-       
-        map.setCenter(location);
+//定义标记样式
+      function drawCircle(ct, rd){
+          //绘制圆形
+          var populationOptions = {
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#FF0000",
+            fillOpacity: 0.35,
+            map: map,
+            center: ct,
+            radius: rd
+          };
+          var cityCircle = new sogou.maps.Circle(populationOptions);        
+      }
+      function writeoutLocation(location){
         $('#lbllat').text(location.y);
-        $('#lbllng').text(location.x);
+        $('#lbllng').text(location.x);        
       }
-      function outputPoint(lat, lng, index, road_name){
-        this.Lat = lat;
-        this.Lng = lng;
-        this.RoadName = road_name;
-        this.IndexInList = index;
-      }
-      function postjson(lat, lng){
-        $.post("/postSogouGps", { carID: "A123456", Lat: lat, Lng: lng }, function (data) {
-          // alert(data.status);
-        });
-      }
-      function clearPoints(){
-        points.length = 0;
-        map.clearAll();
-      }
-      function exportPoints(){
-        // $.post('/exportPoints', {type:'sogou-point', data:JSON.stringify(points)}, function(data){
-        //     if(data.status == 'success'){
-        //       $('#div-output').text(data.content);
-        //     }
-        // });
-        // var roadName = "设置路名";
-        var road1 = "未知道路1";
-        var road2 = "未知道路2";
-        var nextRoadNameList = [road1, road2];
-        var roadName = $('#road-name').val();
-        var pointListArray = new Array();
-        for (var i = 0; i < points.length; i++) {
-          var point = points[i];
-          pointListArray.push(new outputPoint(point.y, point.x, i, roadName));
-        };
-        $('#div-output').text(JSON.stringify({RoadName:roadName, NextRoadNameList:JSON.stringify(nextRoadNameList), PointList: pointListArray}));
-      }
+      // function placeMarker(location) {
+      //   var clickedLocation = location;
+      //   var marker = new sogou.maps.Marker({
+      //       position: location,
+      //       map: map
+      //   });
+       
+      //   map.setCenter(location);
+
+      // }
+      // function outputPoint(lat, lng, index, road_name){
+      //   this.Lat = lat;
+      //   this.Lng = lng;
+      //   this.RoadName = road_name;
+      //   this.IndexInList = index;
+      // }
+      // function postjson(lat, lng){
+      //   $.post("/postSogouGps", { carID: "A123456", Lat: lat, Lng: lng }, function (data) {
+      //     // alert(data.status);
+      //   });
+      // }
+      // function clearPoints(){
+      //   points.length = 0;
+      //   map.clearAll();
+      // }
+      // function exportPoints(){
+      //   // $.post('/exportPoints', {type:'sogou-point', data:JSON.stringify(points)}, function(data){
+      //   //     if(data.status == 'success'){
+      //   //       $('#div-output').text(data.content);
+      //   //     }
+      //   // });
+      //   // var roadName = "设置路名";
+      //   var road1 = "未知道路1";
+      //   var road2 = "未知道路2";
+      //   var nextRoadNameList = [road1, road2];
+      //   var roadName = $('#road-name').val();
+      //   var pointListArray = new Array();
+      //   for (var i = 0; i < points.length; i++) {
+      //     var point = points[i];
+      //     pointListArray.push(new outputPoint(point.y, point.x, i, roadName));
+      //   };
+      //   $('#div-output').text(JSON.stringify({RoadName:roadName, NextRoadNameList:JSON.stringify(nextRoadNameList), PointList: pointListArray}));
+      // }
     </script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>

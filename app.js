@@ -38,11 +38,11 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.signin);
+app.get('/', routes.editpoint);
+app.post('/postgps', routes.postgps);
 app.get('/signin', routes.signin);
 app.get('/theme', routes.theme);
 app.get('/webgis', routes.webgis);
-app.post('/postgps', routes.postgps);
 app.post('/postSogouGps', routes.postSogouGps);
 app.get('/getgps', routes.getgps);
 app.get('/test', routes.test);
