@@ -64,6 +64,9 @@ exports.theme = function(req, res){
 exports.webgis = function(req, res){
 	res.render('webgis', {});
 };
+exports.webgis2 = function(req, res){
+	res.render('webgis2', {});
+};
 exports.editpoint = function(req, res){
 	res.render('editpoint');
 };

@@ -69,7 +69,7 @@
                         zIndex:2
                     });                  
                 }
-                writeoutLocation(evt.point);
+                // writeoutLocation(evt.point);
                 //evt.point 搜狗地图坐标
                 path.push(evt.point);
                 //添加节点蓝点，计算路径距离
@@ -165,26 +165,29 @@
 
       var dis = calcDistance([centerP, newPoint]);
       if(dis > maxDistance){
-        $('#lblMsg').text("超出安全范围内");
+        $('#lblMsg').text("未进入危险区域内");
       }
       else{
-        $('#lblMsg').text("处于安全范围内");
+        $('#lblMsg').text("已进入危险区域");
 
       }
     }
       function drawCircle(ct, rd){
           //绘制圆形
           var populationOptions = {
-            strokeColor: "#00ff00",
+            strokeColor: "#ff0000",
             strokeOpacity: 0.8,
             strokeWeight: 2,
-            fillColor: "#00ff00",
+            fillColor: "#ff0000",
             fillOpacity: 0.35,
             map: map,
             center: ct,
             radius: rd
           };
           cityCircle = new sogou.maps.Circle(populationOptions);        
+      }
+      function clearMask(){
+
       }
       function writeoutLocation(location){
         $('#lbllat').text(location.y);
@@ -219,7 +222,7 @@
           }
           $('#lblMsg').text("");
             // body...
-      }    
+      }      
     </script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>

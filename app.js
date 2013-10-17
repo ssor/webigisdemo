@@ -44,6 +44,7 @@ app.post('/postgps', routes.postgps);
 app.get('/signin', routes.signin);
 app.get('/theme', routes.theme);
 app.get('/webgis', routes.webgis);
+app.get('/webgis2', routes.webgis2);
 app.get('/getgps', routes.getgps);
 app.get('/test', routes.test);
 app.get('/editpoint', routes.editpoint);
