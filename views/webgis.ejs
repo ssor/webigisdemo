@@ -28,6 +28,7 @@
       var cityCircle = null;
       var line = null;
       var radiusLine = null;
+      var currentPosMarker = null;
       function initialize() {
             var myPoint = new sogou.maps.LatLng(39.988176,116.319404);
             // var myPoint = new sogou.maps.Point(12959000,4822625);
@@ -192,7 +193,10 @@
       }    
     function placeMarker(location) {
         var clickedLocation = location;
-        var marker = new sogou.maps.Marker({
+        if(currentPosMarker != null){
+          currentPosMarker.setMap(null);
+        }
+        currentPosMarker = new sogou.maps.Marker({
             position: location,
             map: map
         });

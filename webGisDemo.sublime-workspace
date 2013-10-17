@@ -99,7 +99,7 @@
 			"file": "views/webgis.ejs",
 			"settings":
 			{
-				"buffer_size": 9767,
+				"buffer_size": 9897,
 				"line_ending": "Windows"
 			}
 		},
@@ -107,7 +107,7 @@
 			"file": "views/webgis2.ejs",
 			"settings":
 			{
-				"buffer_size": 9810,
+				"buffer_size": 9940,
 				"line_ending": "Windows"
 			}
 		},
@@ -196,7 +196,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 6,
 			"sheets":
 			[
 				{
@@ -239,8 +239,8 @@
 						"selection":
 						[
 							[
-								1271,
-								1271
+								582,
+								582
 							]
 						],
 						"settings":
@@ -343,15 +343,15 @@
 					"file": "views/webgis.ejs",
 					"settings":
 					{
-						"buffer_size": 9767,
+						"buffer_size": 9897,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4697,
-								4697
+								1121,
+								1093
 							]
 						],
 						"settings":
@@ -361,7 +361,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1734.0,
+						"translation.y": 106.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -371,15 +371,15 @@
 					"file": "views/webgis2.ejs",
 					"settings":
 					{
-						"buffer_size": 9810,
+						"buffer_size": 9940,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2417,
-								2417
+								1121,
+								1121
 							]
 						],
 						"settings":
@@ -389,7 +389,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 564.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
