@@ -22,11 +22,12 @@ app.use(function(req, res, next) {
     req.setEncoding('utf8');
     req.on('data', function(chunk) { 
         data += chunk;
+        console.log(data);
     });
     req.on('end', function() {
         req.rawBody = data;
-        next();
     });
+        next();
 });
 app.use(express.bodyParser());
 app.use(express.methodOverride());
@@ -43,12 +44,10 @@ app.post('/postgps', routes.postgps);
 app.get('/signin', routes.signin);
 app.get('/theme', routes.theme);
 app.get('/webgis', routes.webgis);
-app.post('/postSogouGps', routes.postSogouGps);
 app.get('/getgps', routes.getgps);
 app.get('/test', routes.test);
 app.get('/editpoint', routes.editpoint);
-app.post('/exportPoints', routes.exportPoints);
-app.post('/postRawGPS', routes.postRawGPS);
+app.get('/mobile', routes.mobile);
 
 app.get('/users', user.list);
 

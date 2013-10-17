@@ -21,34 +21,170 @@
     <script type="text/javascript" src="http://api.go2map.com/maps/js/api_v2.5.1.js"></script>
     <script type="text/javascript">
       var map;
+      var convertor;
+      var centerPoint;
+      var maxDistance;
+      var markersOfPath = new Array();
+      var cityCircle;
+      var line;
+      var radiusLine;
       function initialize() {
-        var myLatlng = new sogou.maps.Point(12983703.125, 4827636.71875);
-        var myOptions = {
-          zoom: 12,
-          center: myLatlng,
-          mapTypeId: sogou.maps.MapTypeId.ROADMAP
-        }
-        map = new sogou.maps.Map(document.getElementById("map_canvas"), myOptions);
-        // setTimeout(getGpsData, 3000);
+            var myPoint = new sogou.maps.LatLng(39.988176,116.319404);
+            // var myPoint = new sogou.maps.Point(12959000,4822625);
+            //定义标记样式
+            var markerStyle=new sogou.maps.MarkerImage('http://api.go2map.com/maps/images/v2.0/c31.png',
+                  // 蓝点图标宽16像素，高14像素
+                  new sogou.maps.Size(16, 14),
+                  // 原点在图片的(34,88)
+                  new sogou.maps.Point(34,88),
+                  // 锚点在图标中心
+                  new sogou.maps.Point(8,7),
+                  // 合并图片的大小
+                  new sogou.maps.Size(51, 156));
+            //定义带箭头的样式
+            var myOptions = {
+              zoom: 15,
+              center: myPoint,
+              mapTypeId: sogou.maps.MapTypeId.TERRAIN
+            };
+     
+            map = new sogou.maps.Map(document.getElementById("map_canvas"), myOptions);
+     
+
+            var lineStyle={id:"L02","v:stroke":{color:"#0cf",weight:"5",endcap:"Round",opacity:"75%",endArrow:"Classic",endarrowlength:"long",endarrowwidth:"wide"}};
+     
+
+            var path=[];
+            sogou.maps.event.addListener(map,"click",function(evt)
+            {
+                if(null == line){
+                    line = new sogou.maps.Polyline({
+                        map:map,
+                        style:lineStyle,
+                        zIndex:2
+                    });                  
+                }
+                writeoutLocation(evt.point);
+                //evt.point 搜狗地图坐标
+                path.push(evt.point);
+                //添加节点蓝点，计算路径距离
+                var distance = calcDistance(path);
+                if(path.length <= 1){
+                  markersOfPath[0] =new sogou.maps.Marker(
+                    { map:map,
+                      position:evt.point,
+                      icon:markerStyle,
+                      label:{visible:true}
+                    });    
+                  //标记中心点
+                  centerPoint = evt.point;
+
+                }else{
+                  markersOfPath[1] =new sogou.maps.Marker(
+                    { map:map,
+                      position:evt.point,
+                      icon:markerStyle,
+                      title:distance+"米",
+                      label:{visible:true}});
+                }
+
+                if(path.length>1)
+                {
+                    radiusLine = new sogou.maps.Polyline({
+                        map:map,
+                        styles:[lineStyle],
+                        zIndex:2
+                    });
+                    drawCircle(path[0], distance);
+                    path=[];
+                    // path.push(evt.point);
+
+                    maxDistance = distance;
+                }
+             
+            });
+            sogou.maps.event.addListener(map,"mousemove",function(evt)
+            {
+                //evt.point 搜狗地图坐标
+                if(path.length > 0){
+                  var newPath = path.concat([evt.point]);
+                  line.setPath(newPath);
+                }
+                // path.length>0&&line.setPath(path.concat([evt.point]));
+             
+            });
+            //点击右键结束
+            sogou.maps.event.addListener(map,"rightclick",function(evt)
+            {
+                //evt.point 搜狗地图坐标
+                line.remove();
+                path=[];
+            });
+            //计算距离
+            convertor=new sogou.maps.Convertor();
+
         setInterval(getGpsData, 3000); 
       }    
+    function calcDistance(a)
+    {
+        var b=0,i;
+        for(i=0;i<a.length;i++)
+        {
+            if(a[i+1]) b+=convertor.distance(a[i],a[i+1]);
+        }
+        return parseInt(b)
+    }      
     function getGpsData()
     {
         $.get("/getgps", function (data) {
           // alert(data);
-          if(data.status == "failed"){
+          var obj = JSON.parse(data);
+          if(obj.status == "failed"){
 
           }else {
-            var myPoint = new sogou.maps.Point(data.x,data.y);
-
-            if(data.type != 'sogou'){
-              var convertor = getInstance(sogou.maps.Convertor);
-              myPoint = convertor.toSogou(new sogou.maps.LatLng(data.y, data.x));
+            var point  = obj.point;
+            var myPoint = new sogou.maps.Point(point.x,point.y);
+            if(point.type != 'sogou'){
+              var convertor=new sogou.maps.Convertor();
+              // var convertor = getInstance(sogou.maps.Convertor);
+              myPoint = convertor.toSogou(new sogou.maps.LatLng(point.y, point.x));
             }
             placeMarker(myPoint);
+
+            compareDistance(centerPoint, myPoint);
           }
         });
     }
+    function compareDistance(centerP, newPoint){
+      if(maxDistance == undefined || maxDistance < 0) return;
+
+      var dis = calcDistance([centerP, newPoint]);
+      if(dis > maxDistance){
+        $('#lblMsg').text("超出选定范围");
+      }
+      else{
+        $('#lblMsg').text("处于选定范围内");
+
+      }
+    }
+      function drawCircle(ct, rd){
+          //绘制圆形
+          var populationOptions = {
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#FF0000",
+            fillOpacity: 0.35,
+            map: map,
+            center: ct,
+            radius: rd
+          };
+          cityCircle = new sogou.maps.Circle(populationOptions);        
+      }
+      function writeoutLocation(location){
+        $('#lbllat').text(location.y);
+        $('#lbllng').text(location.x);        
+      }    
     function placeMarker(location) {
         var clickedLocation = location;
         var marker = new sogou.maps.Marker({
@@ -58,6 +194,18 @@
        
         map.setCenter(location);
       }
+    function clearCircle () {
+          maxDistance = -1;
+          cityCircle.setMap(null);
+          markersOfPath[0].setMap(null);
+          markersOfPath[1].setMap(null);
+          line.setMap(null);
+          line = null;
+          radiusLine.setMap(null);
+          radiusLine = null;
+          $('#lblMsg').text("");
+            // body...
+          }      
     </script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -77,18 +225,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">GPS运输监控综合实验</a>
+          <a class="navbar-brand" href="#">GPS监控综合实验</a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li></li>
-            <li class="active"><a style="font-size:22px;" href="#">京A-12345</a></li>
+            <li class="active"><a style="font-size:22px;" href="#"></a></li>
             <!-- <li><a href="#about">About</a></li> -->
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">经度:116.924</a></li>
-            <li><a href="#">纬度:39.427</a></li>
+            <li><a id = "bntClearCircle" href="#" onclick="clearCircle()">清除范围</a></li>
+            <!-- <li><a id = "lbllng" href="#"></a></li> -->
+            <!-- <li><a id = "lbllat" href=""></a></li> -->
           </ul>
 
         </div><!--/.nav-collapse -->
@@ -108,7 +257,7 @@ margin-bottom: 1px;">
     </div> <!-- /container -->
 
     <footer class="container" role="contentinfo">
-    <div style = "text-align: center;">北京ABC智能物联网有限公司</div>
+    <div id = "lblMsg" style = "text-align: center;"></div>
     </footer>
     <!-- Bootstrap core JavaScript
     ================================================== -->

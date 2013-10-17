@@ -67,6 +67,9 @@ exports.webgis = function(req, res){
 exports.editpoint = function(req, res){
 	res.render('editpoint');
 };
+exports.mobile = function(req, res){
+	res.render('mobile', {title:'移动终端'});
+};
 //*********************************************************
 //*********************************************************
 
@@ -77,7 +80,9 @@ exports.getgps = function(req, res){
 	}else{
 		or = {status:"success", point:g_point};
 	}
-	res.send(JSON.stringify(or));
+	var str = JSON.stringify(or);
+	console.log('getpgs => ' + str);
+	res.send(str);
 };
 
 exports.postgps = function(req, res){
@@ -93,6 +98,8 @@ exports.postgps = function(req, res){
 	}else if(gps.type == "end"){
 		g_point = null;
 	}
+	console.log('postgps =>');
+	console.dir(g_point);
 	res.send();
 	return;
 };
